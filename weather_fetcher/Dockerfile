@@ -1,20 +1,22 @@
-FROM ruby:3.4-alpine
+FROM ruby:3.4-slim
 
-RUN apk add --no-cache \
-    build-base \
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    build-essential \
     curl \
-    dcron
+    cron && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 WORKDIR /app
 
-COPY Gemfile ./
-
+COPY Gemfile Gemfile.lock ./
 RUN bundle install
 
 COPY . .
 
-RUN chmod +x bin/start
+RUN chmod +x bin/start init.sh
 
-RUN echo "0 * * * * cd /app && ./bin/start >> /proc/1/fd/1 2>&1" > /etc/crontabs/root
+RUN echo '0 * * * * cd /app && ./bin/start ${WEATHER_CONFIG_PATH:-} >> /proc/1/fd/1 2>&1' > /etc/cron.d/weather-cron && \
+    chmod 0644 /etc/cron.d/weather-cron
 
 CMD ["/app/init.sh"]

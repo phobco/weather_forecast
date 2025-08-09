@@ -1,0 +1,5 @@
+cities:
+  - name: "Moscow"
+    key: "moscow"
+  - name: "Saint-Petersburg"
+    key: "saint_petersburg"

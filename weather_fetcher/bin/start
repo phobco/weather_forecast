@@ -4,16 +4,18 @@
 require 'bundler/setup'
 require_relative '../lib/weather_api/weather_fetcher_service'
 
+config_path = ARGV[0] || ENV.fetch('WEATHER_CONFIG_PATH', nil)
+puts "config_path: #{config_path}"
+
 begin
   puts "=== Weather Fetch Started at #{Time.now} ==="
 
-  service = WeatherApi::WeatherFetcherService.new
+  service = WeatherApi::WeatherFetcherService.new(config_path)
   service.fetch_and_publish
 
   puts "=== Weather Fetch Completed at #{Time.now} ==="
 rescue StandardError => e
   puts "=== Weather Fetch Failed at #{Time.now} ==="
   puts "Error: #{e.message}"
-  puts e.backtrace
   exit 1
 end

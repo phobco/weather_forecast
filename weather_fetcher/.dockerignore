@@ -1,0 +1,26 @@
+# Git files
+.git
+.gitignore
+
+# Ruby/Bundle files
+.bundle
+vendor/bundle
+
+# RSpec files (for faster builds)
+spec/
+.rspec
+
+# Development files
+*.log
+tmp/
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo

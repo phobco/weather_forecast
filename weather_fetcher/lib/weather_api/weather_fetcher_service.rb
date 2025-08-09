@@ -1,25 +1,32 @@
 # frozen_string_literal: true
 
+require 'yaml'
 require_relative 'weather_api_service'
 require_relative '../nats/connection_service'
 
 module WeatherApi
   class WeatherFetcherService
-    CITIES_MAP = [
-      { name: 'Moscow', key: 'moscow' },
-      { name: 'Saint-Petersburg', key: 'saint_petersburg' }
-    ].freeze
+    attr_reader :config_path, :config
+
+    def initialize(config_path = nil)
+      @config_path = config_path || default_config_path
+      @config = load_config
+    end
 
     def fetch_and_publish
-      CITIES_MAP.each do |city|
-        weather_data = get_weather_data(city[:name])
-        publish_weather_data(city[:key], weather_data)
+      cities.each do |city|
+        weather_data = get_weather_data(city['name'])
+        publish_weather_data(city['key'], weather_data)
       end
     rescue StandardError => e
       puts "Failed to publish weather data: #{e.message}"
-      raise e
+      raise
     ensure
       nats_client&.close
+    end
+
+    def cities
+      config['cities']
     end
 
     private
@@ -32,6 +39,22 @@ module WeatherApi
     rescue StandardError => e
       puts "Failed to publish to #{topic}: #{e.message}"
       raise
+    end
+
+    def default_config_path
+      File.expand_path('../../config/weather_config.yml', __dir__)
+    end
+
+    def load_config
+      raise ArgumentError, "Configuration file not found: #{config_path}" unless File.exist?(config_path)
+
+      config = YAML.safe_load_file(config_path) || {}
+
+      raise ArgumentError, "No cities configured. Please check your config file: #{config_path}" if config['cities'].nil? || config['cities'].empty?
+
+      config
+    rescue Psych::SyntaxError => e
+      raise ArgumentError, "Invalid YAML syntax in config file: #{e.message}"
     end
 
     def get_weather_data(city)
