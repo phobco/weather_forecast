@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  nats:
+    image: nats:2.11.0-alpine
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["--config", "/etc/nats/nats.conf"]
+    environment:
+      - NATS_FETCHER_PASSWORD=${NATS_FETCHER_PASSWORD}
+      - NATS_WEB_PASSWORD=${NATS_WEB_PASSWORD}
+      - NATS_ADMIN_PASSWORD=${NATS_ADMIN_PASSWORD}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8222/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - nats_data:/nats/jetstream
+      - ./nats.conf:/etc/nats/nats.conf:ro
+
+  weather-fetcher:
+    build:
+      context: ./weather_fetcher
+      dockerfile: Dockerfile
+    environment:
+      - NATS_URL=nats://weather_fetcher:${NATS_FETCHER_PASSWORD}@nats:4222
+      - WEATHER_API_KEY=${WEATHER_API_KEY:-}
+    depends_on:
+      nats:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./weather_fetcher:/app
+    working_dir: /app
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    environment:
+      - RAILS_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/weather_forecast_production
+      - NATS_URL=nats://weather_web:${NATS_WEB_PASSWORD}@nats:4222
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY:-}
+    ports:
+      - "3000:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./web:/rails
+    working_dir: /rails
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: weather_forecast
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  nats_data:

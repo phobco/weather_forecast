@@ -1,0 +1,86 @@
+# Ignore bundler config and cached gems
+/.bundle/
+/vendor/bundle/
+
+# Ignore application configuration
+/config/application.yml
+
+# Ignore master key for decrypting credentials
+/config/master.key
+/web/config/master.key
+
+# Ignore all logfiles and tempfiles
+/log/*
+/tmp/*
+/web/log/*
+/web/tmp/*
+!/log/.keep
+!/tmp/.keep
+!/web/log/.keep
+!/web/tmp/.keep
+
+# Ignore pidfiles, but keep the directory
+/tmp/pids/*
+!/tmp/pids/
+!/tmp/pids/.keep
+/web/tmp/pids/*
+!/web/tmp/pids/
+!/web/tmp/pids/.keep
+
+# Ignore storage (uploaded files in development and test)
+/storage/*
+!/storage/.keep
+/web/storage/*
+!/web/storage/.keep
+
+# Ignore assets
+/public/assets
+/web/public/assets
+
+# Ignore node modules
+node_modules/
+/web/node_modules/
+
+# Ignore yarn files
+.yarn-integrity
+/web/.yarn-integrity
+
+# Ignore environment variables
+.env
+.env.local
+.env.*.local
+
+# Ignore Docker volumes data
+postgres_data/
+nats_data/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ruby version managers
+.ruby-version
+.rvmrc
+
+# Compiled Ruby files
+*.gem
+*.rbc
+
+# Test coverage
+coverage/
+
+# Temporary files
+*.tmp
+*.temp

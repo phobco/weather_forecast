@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/setup'
+require_relative '../lib/weather_api/weather_fetcher_service'
+
+begin
+  puts "=== Weather Fetch Started at #{Time.now} ==="
+
+  service = WeatherApi::WeatherFetcherService.new
+  service.fetch_and_publish
+
+  puts "=== Weather Fetch Completed at #{Time.now} ==="
+rescue StandardError => e
+  puts "=== Weather Fetch Failed at #{Time.now} ==="
+  puts "Error: #{e.message}"
+  puts e.backtrace
+  exit 1
+end

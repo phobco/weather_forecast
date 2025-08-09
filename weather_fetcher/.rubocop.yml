@@ -1,0 +1,37 @@
+# RuboCop configuration for weather producer
+
+AllCops:
+  TargetRubyVersion: 3.4
+  NewCops: enable
+  SuggestExtensions: false
+
+# Disable documentation requirement for classes
+Style/Documentation:
+  Enabled: false
+
+# Disable super call requirement for inherited classes
+Lint/MissingSuper:
+  Enabled: false
+
+# Allow long lines for URLs and other cases
+Layout/LineLength:
+  Max: 120
+  AllowedPatterns: ['(\A|\s)#']
+
+# Allow long blocks
+Metrics/BlockLength:
+  Enabled: false
+
+# Layout and indentation rules
+Layout/IndentationWidth:
+  Enabled: true
+  Width: 2
+
+Layout/IndentationConsistency:
+  Enabled: true
+
+Layout/BlockAlignment:
+  Enabled: true
+
+Layout/EndAlignment:
+  Enabled: true
