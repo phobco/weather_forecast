@@ -1,0 +1,8 @@
+ru:
+  cities:
+    moscow: Москва
+    saint_petersburg: Санкт-Петербург
+  errors:
+    forecast:
+      failed_to_fetch: Не удалось получить данные о погоде. Попробуйте позже.
+      no_data: Нет данных

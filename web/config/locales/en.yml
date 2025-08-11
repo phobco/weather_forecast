@@ -28,4 +28,10 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  cities:
+    moscow: Moscow
+    saint_petersburg: Saint Petersburg
+  errors:
+    forecast:
+      failed_to_fetch: Failed to fetch weather data. Please try again later.
+      no_data: No data

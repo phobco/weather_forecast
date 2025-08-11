@@ -1,0 +1,29 @@
+<% content_for :title, "Прогноз погоды" %>
+
+<div class="bg-gray-50 min-h-screen">
+  <div class="max-w-5xl mx-auto py-6 px-4">
+    <header class="text-center mb-6">
+      <h1 class="text-2xl font-light text-gray-900 mb-1">Прогноз погоды</h1>
+      <p class="text-sm text-gray-500"><%= Date.current.strftime('%d.%m.%Y') %></p>
+    </header>
+
+    <% if flash[:alert] %>
+      <div class="bg-red-50 border-l-4 border-red-200 text-red-700 px-4 py-3 rounded-r mb-4">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+
+    <div class="space-y-6">
+      <% @weather_data.each do |city, data| %>
+      <section>
+        <h2 class="text-lg font-medium text-gray-800 mb-3"><%= I18n.t("cities.#{city}") %></h2>
+        <%= render partial: 'forecast', locals: { weather_data: data } %>
+      </section>
+      <% end %>
+    </div>
+
+    <footer class="text-center mt-8 pt-4 border-t border-gray-200">
+      <p class="text-xs text-gray-400">Обновляется каждый час</p>
+    </footer>
+  </div>
+</div>
