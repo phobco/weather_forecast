@@ -1,0 +1,4 @@
+default: --format pretty
+html: --format html --out features_report.html
+json: --format json --out features_report.json
+nats: NATS_TEST_URL=nats://test_user:test_password@localhost:4222 bundle exec cucumber

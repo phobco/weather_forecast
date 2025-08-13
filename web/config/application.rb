@@ -39,7 +39,7 @@ module WeatherForecast
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.i18n.default_locale = :ru
-    config.i18n.available_locales = [:ru, :en]
+    config.i18n.available_locales = [ :ru, :en ]
     config.i18n.fallbacks = true
   end
 end

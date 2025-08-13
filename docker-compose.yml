@@ -46,6 +46,7 @@ services:
       - DB_HOST=postgres
       - DB_PORT=5432
       - NATS_URL=nats://weather_web:${NATS_WEB_PASSWORD:-web_password}@nats:4222
+      - NATS_TEST_URL=nats://test_user:test_password@localhost:4222
     ports:
       - "3000:3000"
     depends_on:
