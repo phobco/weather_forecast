@@ -18,8 +18,9 @@ docker compose up
 Перейдите в браузере по адресу: http://localhost:3000
 
 ## Структура проекта
-- `web/` - Rails приложение
 - `weather_fetcher/` - Ruby сервис для получения погоды
+- `web/` - Rails приложение
 - `nats.conf` - конфигурация NATS сервера
+
 
 
