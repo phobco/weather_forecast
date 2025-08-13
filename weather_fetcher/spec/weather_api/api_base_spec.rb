@@ -32,7 +32,7 @@ RSpec.describe WeatherApi::ApiBase do
 
   describe '#send_request' do
     let(:test_url) { 'https://api.weatherapi.com/v1/test' }
-    let(:mock_response) { double('HTTParty::Response') }
+    let(:mock_response) { double('HTTParty::Response', code: 200) }
 
     before do
       allow(HTTParty).to receive(:send).and_return(mock_response)
