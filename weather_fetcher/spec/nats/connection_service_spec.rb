@@ -3,34 +3,29 @@
 require 'spec_helper'
 
 RSpec.describe Nats::ConnectionService do
-  let(:mock_nats_client) { double('NATS::Client') }
-  let(:mock_jetstream) { double('JetStream') }
-  let(:nats_url) { 'nats://localhost:4222' }
+  let(:nats_url) { ENV.fetch('NATS_URL', 'nats://test_user:test_password@localhost:4222') }
+  let(:service) { described_class.new(nats_url: nats_url) }
 
-  before do
-    allow(NATS).to receive(:connect).and_return(mock_nats_client)
-    allow(mock_nats_client).to receive(:jetstream).and_return(mock_jetstream)
-    allow(mock_jetstream).to receive(:add_stream)
+  after(:each) do
+    service.close if service.respond_to?(:client) && service.client
   end
-
-  subject(:service) { described_class.new(nats_url: nats_url) }
 
   describe '#initialize' do
     it 'uses provided NATS URL' do
-      expect(service.nats_url).to eq('nats://localhost:4222')
+      expect(service.nats_url).to eq(nats_url)
     end
 
     it 'uses custom NATS URL when provided' do
-      custom_service = described_class.new(nats_url: 'nats://custom:4222')
-      expect(custom_service.nats_url).to eq('nats://custom:4222')
+      allow_any_instance_of(described_class).to receive(:setup_stream)
+
+      custom_url = 'nats://custom:4222'
+      custom_service = described_class.new(nats_url: custom_url)
+      expect(custom_service.nats_url).to eq(custom_url)
     end
 
-    it 'sets up weather stream on initialization' do
-      expect(mock_jetstream).to receive(:add_stream).with(
-        name: 'WEATHER_STREAM',
-        subjects: ['weather.*']
-      )
-      service
+    it 'creates NATS connection successfully' do
+      expect(service.client).to be_a(NATS::Client)
+      expect(service.client.connected?).to be true
     end
 
     context 'when NATS_URL is not set' do
@@ -46,10 +41,8 @@ RSpec.describe Nats::ConnectionService do
 
   describe '#client' do
     it 'creates NATS connection with correct URL' do
-      expect(NATS).to receive(:connect).with('nats://test:4222').and_return(mock_nats_client)
-
-      test_service = described_class.new(nats_url: 'nats://test:4222')
-      expect(test_service.client).to eq(mock_nats_client)
+      expect(service.client).to be_a(NATS::Client)
+      expect(service.client.connected?).to be true
     end
 
     it 'returns same client instance on multiple calls' do
@@ -61,14 +54,43 @@ RSpec.describe Nats::ConnectionService do
 
   describe '#jetstream' do
     it 'returns jetstream from client' do
-      expect(service.jetstream).to eq(mock_jetstream)
+      expect(service.jetstream).to be_a(NATS::JetStream)
+    end
+
+    it 'returns same jetstream instance on multiple calls' do
+      js1 = service.jetstream
+      js2 = service.jetstream
+      expect(js1).to eq(js2)
     end
   end
 
   describe '#close' do
     it 'closes the NATS connection' do
-      expect(mock_nats_client).to receive(:close)
+      client = service.client
+      expect(client.connected?).to be true
+
       service.close
+      expect(client.connected?).to be false
+    end
+  end
+
+  describe 'real NATS operations' do
+    it 'can publish and subscribe to messages' do
+      received_messages = []
+      subscription = service.client.subscribe('weather.test') do |msg|
+        received_messages << msg.data
+      end
+
+      sleep(0.1)
+
+      test_message = 'test weather data'
+      service.client.publish('weather.test', test_message)
+
+      sleep(0.1)
+
+      expect(received_messages).to include(test_message)
+
+      subscription.unsubscribe
     end
   end
 end

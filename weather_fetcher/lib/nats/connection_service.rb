@@ -31,10 +31,22 @@ module Nats
     private
 
     def setup_stream
+      return if stream_exists?
+
       jetstream.add_stream(
         name: STREAM_NAME,
         subjects: SUBJECTS
       )
+    end
+
+    def stream_exists?
+      begin
+        jetstream.stream_info(STREAM_NAME)
+        true
+      rescue NATS::JetStream::API::Error => e
+        return false if e.message.include?('stream not found')
+        raise e
+      end
     end
   end
 end
