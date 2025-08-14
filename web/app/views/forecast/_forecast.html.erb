@@ -1,20 +1,18 @@
 <% if weather_data.present? && weather_data['hourly_forecast'].present? %>
-  <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 inline-block">
-    <div class="flex gap-8">
-      <% weather_data['hourly_forecast'].each do |hour_data| %>
-        <div class="text-center min-w-16">
-          <div class="text-xs text-gray-500 mb-2">
-            <%= hour_data['display_time'] || "#{hour_data['hour']}:00" %>
-          </div>
-          <div class="text-lg font-light text-gray-900">
-            <%= hour_data['temperature']&.round(1) || '—' %><span class="text-sm text-gray-400">°</span>
-          </div>
+  <div class="flex flex-nowrap overflow-x-auto gap-4 pb-3">
+    <% weather_data['hourly_forecast'].each do |hour_data| %>
+      <div class="flex-shrink-0 text-center bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl p-4 w-24 border border-blue-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+        <div class="text-sm text-blue-700 font-semibold mb-2">
+          <%= hour_data['display_time'] || "#{hour_data['hour']}:00" %>
         </div>
-      <% end %>
-    </div>
+        <div class="text-2xl font-bold text-gray-900">
+          <%= hour_data['temperature']&.round(1) || '—' %>°
+        </div>
+      </div>
+    <% end %>
   </div>
 <% else %>
-  <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 inline-block">
-    <p class="text-gray-400 text-sm"><%= I18n.t('errors.forecast.no_data') %></p>
+  <div class="text-center text-gray-500 py-8">
+    <%= I18n.t('errors.forecast.no_data') %>
   </div>
 <% end %>
