@@ -24,8 +24,20 @@ fi
 
 # If running the rails server then precompile assets
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
-  # Precompile assets if they don't exist
+  # Build JavaScript assets if they don't exist
   if [ ! -f "app/assets/builds/application.js" ]; then
+    echo "Building JavaScript assets..."
+    yarn build
+  fi
+
+  # Build Tailwind CSS if it doesn't exist
+  if [ ! -f "app/assets/builds/tailwind.css" ]; then
+    echo "Building Tailwind CSS..."
+    ./bin/rails tailwindcss:build
+  fi
+
+  # Precompile assets if they don't exist
+  if [ ! -f "app/assets/builds/application.js" ] || [ ! -f "app/assets/builds/tailwind.css" ]; then
     echo "Precompiling assets..."
     ./bin/rails assets:precompile
   fi

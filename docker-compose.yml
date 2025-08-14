@@ -58,6 +58,7 @@ services:
     volumes:
       - ./web:/rails
       - bundle_cache:/usr/local/bundle
+      - node_modules_cache:/rails/node_modules
     working_dir: /rails
     stdin_open: true
     tty: true
@@ -83,3 +84,4 @@ volumes:
   postgres_data:
   nats_data:
   bundle_cache:
+  node_modules_cache:
