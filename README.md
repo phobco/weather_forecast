@@ -3,6 +3,7 @@
 ## Быстрый старт
 
 ### 1. Настройка переменных окружения
+Создаём `.env` файл
 ```bash
 cp .env.example .env
 ```
@@ -26,6 +27,7 @@ docker exec weather_forecast-web-1 bin/rails assets:precompile
 - `weather_fetcher/` - Ruby сервис для получения погоды
 - `web/` - Rails приложение для отображения погоды
 - `nats.conf` - конфигурация NATS сервера
+
 
 
 
