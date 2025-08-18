@@ -17,10 +17,16 @@ docker compose up
 ### 3. Открыть приложение
 Перейдите в браузере по адресу: http://localhost:3000
 
+\* в случае ошибки выполнить следующую команду в новой вкладке терминала:
+```bash
+docker exec weather_forecast-web-1 bin/rails assets:precompile
+```
+
 ## Структура проекта
 - `weather_fetcher/` - Ruby сервис для получения погоды
-- `web/` - Rails приложение
+- `web/` - Rails приложение для отображения погоды
 - `nats.conf` - конфигурация NATS сервера
+
 
 
 
