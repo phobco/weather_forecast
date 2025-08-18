@@ -23,10 +23,29 @@ docker compose up
 docker exec weather_forecast-web-1 bin/rails assets:precompile
 ```
 
+### Дополнительно: проверить работоспособность и данные в NATS
+1. Зайти в Rails консоль запущенного Docker контейнера (weather_forecast-web-1)
+```bash
+docker exec -it weather_forecast-web-1 bundle exec rails c
+```
+2. Подключиться к NATS клиенту
+```ruby
+require 'nats/client'
+client = NATS.connect('nats://admin:admin@nats:4222')
+```
+
+Получение "сырых" данных о погоде в Москве из JetStream
+```ruby
+raw_data = client.jetstream.get_last_msg('WEATHER_STREAM', 'weather.moscow').data
+JSON.parse(raw_data)
+```
+
+
 ## Структура проекта
 - `weather_fetcher/` - Ruby сервис для получения погоды
 - `web/` - Rails приложение для отображения погоды
 - `nats.conf` - конфигурация NATS сервера
+
 
 
 
