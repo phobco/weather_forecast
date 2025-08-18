@@ -8,7 +8,20 @@
 cp .env.example .env
 ```
 
-**Важно:** Для доступа к Weather API необходим `WEATHER_API_KEY`. (будет отправлен вместе со ссылкой на репозиторий)
+**Важно:** Для доступа к Weather API необходимо будет указать `WEATHER_API_KEY` в `.env` файле. (API ключ будет отправлен вместе со ссылкой на репозиторий)
+
+Пример `.env` файла:
+```
+NATS_ADMIN_PASSWORD=admin
+NATS_FETCHER_PASSWORD=fetcher
+NATS_WEB_PASSWORD=web
+
+# https://www.weatherapi.com/my/
+WEATHER_API_KEY=<API КЛЮЧ>           <--- заменить <API КЛЮЧ> на реальный ключ
+
+WEATHER_CONFIG_PATH=config/weather_config.yml
+```
+
 
 ### 2. Запуск с Docker
 ```bash
@@ -45,6 +58,7 @@ JSON.parse(raw_data)
 - `weather_fetcher/` - Ruby сервис для получения погоды
 - `web/` - Rails приложение для отображения погоды
 - `nats.conf` - конфигурация NATS сервера
+
 
 
 
