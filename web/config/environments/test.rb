@@ -51,6 +51,8 @@ Rails.application.configure do
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
 
-  # NATS Configuration for Test (disabled)
-  config.nats = {}
+  # NATS Configuration for Test
+  config.nats = {
+    servers: [ 'nats://test_user:test_password@localhost:4222' ]
+  }
 end
