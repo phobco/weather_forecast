@@ -71,4 +71,11 @@ Rails.application.configure do
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  config.nats = {
+    url: ENV.fetch('NATS_URL'),
+    max_reconnect_attempts: 20,
+    reconnect_time_wait: 5,
+    name: "weather_web_#{Rails.env}"
+  }
 end
