@@ -30,17 +30,15 @@ FROM base AS build
 
 # Install packages needed to build gems and node modules
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev node-gyp pkg-config python-is-python3 && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev node-gyp pkg-config python-is-python3 unzip && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-# Install JavaScript dependencies
-ARG NODE_VERSION=22.16.0
-ARG YARN_VERSION=latest
-ENV PATH=/usr/local/node/bin:$PATH
-RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
-    /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
-    rm -rf /tmp/node-build-master
-RUN corepack enable && yarn set version $YARN_VERSION
+# Install Bun
+ARG BUN_VERSION=1.0.35
+ENV PATH=/usr/local/bun/bin:$PATH
+RUN curl -fsSL https://bun.sh/install | bash && \
+    mkdir -p /usr/local/bun/bin && \
+    ln -s /root/.bun/bin/bun /usr/local/bun/bin/bun
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
@@ -49,9 +47,9 @@ RUN bundle config set --local path '/usr/local/bundle' && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
 
-# Install node modules
-COPY package.json yarn.lock ./
-RUN yarn install --immutable
+# Install dependencies with Bun
+COPY package.json ./
+RUN bun install
 
 # Copy application code
 COPY . .
@@ -60,11 +58,10 @@ COPY . .
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Build JavaScript assets
-RUN yarn build
+RUN bun run build
 
-# Build Tailwind CSS and precompile assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails tailwindcss:build
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# Build CSS assets
+RUN bundle exec rails tailwindcss:build
 
 # List compiled assets to verify they exist
 RUN ls -la app/assets/builds/
@@ -75,10 +72,10 @@ FROM base
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
-COPY --from=build /usr/local/node /usr/local/node
+COPY --from=build /usr/local/bun /usr/local/bun
 
-# Make node and yarn available in PATH
-ENV PATH=/usr/local/node/bin:$PATH
+# Make bun available in PATH
+ENV PATH=/usr/local/bun/bin:$PATH
 
 # Create necessary directories
 RUN mkdir -p /rails/app/assets/builds
